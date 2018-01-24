@@ -12,4 +12,5 @@ key
 bucket
 domain => 文件访问域名
 filename_type => 默认为原文件名称, random 时间名称
+dir => 目录 默认为根目录
 ```

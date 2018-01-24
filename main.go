@@ -10,16 +10,21 @@ import (
 )
 
 //生成新文件名称
-func generatorFileName(filenameType, originFileName string) (fileName string) {
+func generatorFileName(filenameType, directory, originFileName string) (fileName string) {
 	switch filenameType {
 	//random暂时也用时间代替
 	case "random":fallthrough
 	case "datetime":
 		datetime := time.Now().Format("20060102150405")
-		fileName = fmt.Sprintf("%s%s",datetime,filepath.Ext(originFileName))
+		fileName = fmt.Sprintf("%s%s", datetime, filepath.Ext(originFileName))
 	default:
 		fileName = originFileName
 	}
+
+	if (directory != "") {
+		fileName = directory + "/" + fileName
+	}
+
 	return
 }
 
@@ -32,6 +37,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	secret := r.FormValue("secret")
 	domain := r.FormValue("domain") //bucket域名
 	filenameType := r.FormValue("filename_type") //文件名类型域名
+	dir := r.FormValue("dir") //文件名类型域名
 
 	//新增client
 	client, err := oss.New(endPoint, key, secret)
@@ -54,7 +60,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	//新文件名称
-	fileName := generatorFileName(filenameType, fileHandle.Filename)
+	fileName := generatorFileName(filenameType, dir, fileHandle.Filename)
 
 	//上传文件
 	err = bucket.PutObject(fileName, file)
